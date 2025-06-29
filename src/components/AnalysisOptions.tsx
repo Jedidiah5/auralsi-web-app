@@ -69,41 +69,41 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
 
   const getColorClasses = (color: string) => {
     const colorMap = {
-      blue: 'bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700',
-      green: 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700',
-      yellow: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100 text-yellow-700',
-      purple: 'bg-purple-50 border-purple-200 hover:bg-purple-100 text-purple-700',
-      indigo: 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100 text-indigo-700',
-      pink: 'bg-pink-50 border-pink-200 hover:bg-pink-100 text-pink-700'
+      blue: 'bg-blue-900/50 border-blue-800 hover:bg-blue-800 text-blue-400',
+      green: 'bg-green-900/50 border-green-800 hover:bg-green-800 text-green-400',
+      yellow: 'bg-yellow-900/50 border-yellow-800 hover:bg-yellow-800 text-yellow-400',
+      purple: 'bg-purple-900/50 border-purple-800 hover:bg-purple-800 text-purple-400',
+      indigo: 'bg-indigo-900/50 border-indigo-800 hover:bg-indigo-800 text-indigo-400',
+      pink: 'bg-pink-900/50 border-pink-800 hover:bg-pink-800 text-pink-400'
     };
     return colorMap[color as keyof typeof colorMap] || colorMap.blue;
   };
 
   const getIconColorClasses = (color: string) => {
     const colorMap = {
-      blue: 'text-blue-600',
-      green: 'text-green-600',
-      yellow: 'text-yellow-600',
-      purple: 'text-purple-600',
-      indigo: 'text-indigo-600',
-      pink: 'text-pink-600'
+      blue: 'text-blue-500',
+      green: 'text-green-500',
+      yellow: 'text-yellow-500',
+      purple: 'text-purple-500',
+      indigo: 'text-indigo-500',
+      pink: 'text-pink-500'
     };
     return colorMap[color as keyof typeof colorMap] || colorMap.blue;
   };
 
   if (isAnalyzing) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-12 text-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="relative">
-            <Loader2 className="w-16 h-16 text-blue-500 animate-spin" />
+            <Loader2 className="w-16 h-16 text-blue-400 animate-spin" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <Brain className="w-8 h-8 text-blue-600" />
+              <Brain className="w-8 h-8 text-blue-500" />
             </div>
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold text-gray-900">Analyzing Document</h3>
-            <p className="text-gray-600">Auralis is processing your request...</p>
+            <h3 className="text-xl font-semibold text-white">Analyzing Document</h3>
+            <p className="text-gray-400">Auralis is processing your request...</p>
           </div>
         </div>
       </div>
@@ -113,25 +113,25 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
   return (
     <div className="space-y-6">
       {/* Document Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
         <div className="flex items-start space-x-4">
-          <div className="p-3 bg-blue-50 rounded-lg">
-            <FileText className="w-6 h-6 text-blue-600" />
+          <div className="p-3 bg-blue-900/50 rounded-lg">
+            <FileText className="w-6 h-6 text-blue-400" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">{document.fileName}</h2>
-            <p className="text-gray-600 mt-1">Uploaded {document.uploadedAt.toLocaleString()}</p>
+            <h2 className="text-xl font-semibold text-white">{document.fileName}</h2>
+            <p className="text-gray-400 mt-1">Uploaded {document.uploadedAt.toLocaleString()}</p>
           </div>
         </div>
       </div>
 
       {/* Analysis Options */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
         <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-white mb-2">
             What would you like to do with this document?
           </h3>
-          <p className="text-gray-600">
+          <p className="text-gray-400">
             Choose one of the following analysis options, or type your own custom request:
           </p>
         </div>
@@ -150,8 +150,8 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
                     <Icon className={`w-6 h-6 ${getIconColorClasses(option.color)}`} />
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">{option.type}</h4>
-                    <p className="text-sm opacity-80">{option.description}</p>
+                    <h4 className="font-semibold mb-1 text-white">{option.type}</h4>
+                    <p className="text-sm opacity-80 text-gray-300">{option.description}</p>
                   </div>
                 </div>
               </button>
@@ -160,12 +160,12 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
         </div>
 
         {/* Custom Request Section */}
-        <div className="border-t border-gray-200 pt-6">
+        <div className="border-t border-gray-600 pt-6">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-semibold text-gray-900">Custom Request</h4>
+            <h4 className="text-lg font-semibold text-white">Custom Request</h4>
             <button
               onClick={() => setShowCustomInput(!showCustomInput)}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-blue-400 hover:text-blue-300 font-medium"
             >
               {showCustomInput ? 'Cancel' : 'Type your own request'}
             </button>
@@ -177,7 +177,7 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
                 value={customRequest}
                 onChange={(e) => setCustomRequest(e.target.value)}
                 placeholder="Describe what you'd like to know about this document..."
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full p-4 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-gray-700 text-white placeholder-gray-400"
                 rows={3}
               />
               <div className="flex justify-end space-x-3">
@@ -186,7 +186,7 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
                     setShowCustomInput(false);
                     setCustomRequest('');
                   }}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                  className="px-4 py-2 text-gray-400 hover:text-gray-300 transition-colors"
                 >
                   Cancel
                 </button>
@@ -204,19 +204,19 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       </div>
 
       {/* Help Section */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
-        <h4 className="font-semibold text-gray-900 mb-2">How it works</h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
+      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl p-6 border border-gray-700">
+        <h4 className="font-semibold text-white mb-2">How it works</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-300">
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-xs">1</div>
+            <div className="w-6 h-6 bg-blue-900/50 rounded-full flex items-center justify-center text-blue-400 font-semibold text-xs">1</div>
             <span>Choose your preferred analysis type</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-semibold text-xs">2</div>
+            <div className="w-6 h-6 bg-purple-900/50 rounded-full flex items-center justify-center text-purple-400 font-semibold text-xs">2</div>
             <span>Auralis processes your document</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-semibold text-xs">3</div>
+            <div className="w-6 h-6 bg-green-900/50 rounded-full flex items-center justify-center text-green-400 font-semibold text-xs">3</div>
             <span>Get tailored insights and analysis</span>
           </div>
         </div>

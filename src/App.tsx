@@ -15,6 +15,12 @@ export interface AnalysisResult {
     answer: string;
   }>;
   uploadedAt: Date;
+  conversation?: Array<{
+    id: string;
+    question: string;
+    answer: string;
+    timestamp: Date;
+  }>;
 }
 
 export interface UploadedDocument {
@@ -175,8 +181,75 @@ function App() {
     ];
   };
 
+  const handleFollowUpQuestion = async (analysisId: string, question: string) => {
+    // Find the current analysis
+    const analysisIndex = analysisResults.findIndex(result => result.id === analysisId);
+    if (analysisIndex === -1) return;
+
+    const analysis = analysisResults[analysisIndex];
+    
+    // Generate AI response to the follow-up question
+    const answer = await generateFollowUpAnswer(analysis, question);
+    
+    // Create conversation entry
+    const conversationEntry = {
+      id: Math.random().toString(36).substr(2, 9),
+      question,
+      answer,
+      timestamp: new Date()
+    };
+
+    // Update the analysis with new conversation
+    const updatedAnalysis = {
+      ...analysis,
+      conversation: [...(analysis.conversation || []), conversationEntry]
+    };
+
+    // Update the analysis results
+    const updatedResults = [...analysisResults];
+    updatedResults[analysisIndex] = updatedAnalysis;
+    setAnalysisResults(updatedResults);
+
+    // Update current analysis if it's the one being modified
+    if (currentAnalysis?.id === analysisId) {
+      setCurrentAnalysis(updatedAnalysis);
+    }
+  };
+
+  const generateFollowUpAnswer = async (analysis: AnalysisResult, question: string): Promise<string> => {
+    // Simulate AI processing delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Generate contextual response based on the question and document content
+    const questionLower = question.toLowerCase();
+    const documentContent = analysis.content;
+    
+    if (questionLower.includes('summary') || questionLower.includes('main points')) {
+      return `Based on the ${analysis.outputType.toLowerCase()} of "${analysis.fileName}", the main points include: ${documentContent.substring(0, 200)}... The document emphasizes key developments and strategic considerations that are relevant to your question.`;
+    }
+    
+    if (questionLower.includes('challenge') || questionLower.includes('problem')) {
+      return `The document identifies several challenges: implementation complexity, resource requirements, and the need for strategic planning. These challenges require careful consideration and proper resource allocation to overcome successfully.`;
+    }
+    
+    if (questionLower.includes('benefit') || questionLower.includes('advantage')) {
+      return `The key benefits highlighted in the document include improved efficiency, cost reduction, and enhanced strategic positioning. These advantages make the investment worthwhile despite the initial challenges.`;
+    }
+    
+    if (questionLower.includes('timeline') || questionLower.includes('when') || questionLower.includes('time')) {
+      return `According to the analysis, most implementations show initial results within 6-12 months, with full ROI typically achieved within 18-24 months. The timeline varies based on organization size and implementation scope.`;
+    }
+    
+    if (questionLower.includes('cost') || questionLower.includes('investment') || questionLower.includes('money')) {
+      return `The document indicates that investment requirements vary significantly based on organization size and implementation scope. However, the return on investment is typically achieved within 18-24 months, making it a sound strategic decision.`;
+    }
+    
+    // Default response for other questions
+    return `Based on the ${analysis.outputType.toLowerCase()} of "${analysis.fileName}", ${documentContent.substring(0, 150)}... The document provides relevant context for your question about "${question}". The analysis suggests that this information can be applied strategically to achieve better outcomes.`;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-slate-800">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
@@ -191,8 +264,8 @@ function App() {
               
               {/* Recent Documents */}
               {uploadedDocuments.length > 0 && (
-                <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Documents</h3>
+                <div className="mt-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Recent Documents</h3>
                   <div className="space-y-3">
                     {uploadedDocuments.slice(0, 5).map((doc) => (
                       <button
@@ -203,14 +276,14 @@ function App() {
                         }}
                         className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
                           currentDocument?.id === doc.id
-                            ? 'bg-blue-50 border border-blue-200'
-                            : 'hover:bg-gray-50 border border-transparent'
+                            ? 'bg-blue-900/50 border border-blue-600'
+                            : 'hover:bg-gray-700 border border-transparent'
                         }`}
                       >
-                        <div className="font-medium text-gray-900 truncate">
+                        <div className="font-medium text-white truncate">
                           {doc.fileName}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-400">
                           {doc.uploadedAt.toLocaleDateString()}
                         </div>
                       </button>
@@ -221,8 +294,8 @@ function App() {
 
               {/* Recent Analysis */}
               {analysisResults.length > 0 && (
-                <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Analysis</h3>
+                <div className="mt-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Recent Analysis</h3>
                   <div className="space-y-3">
                     {analysisResults.slice(0, 3).map((result) => (
                       <button
@@ -230,17 +303,17 @@ function App() {
                         onClick={() => setCurrentAnalysis(result)}
                         className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
                           currentAnalysis?.id === result.id
-                            ? 'bg-purple-50 border border-purple-200'
-                            : 'hover:bg-gray-50 border border-transparent'
+                            ? 'bg-purple-900/50 border border-purple-600'
+                            : 'hover:bg-gray-700 border border-transparent'
                         }`}
                       >
-                        <div className="font-medium text-gray-900 truncate">
+                        <div className="font-medium text-white truncate">
                           {result.fileName}
                         </div>
-                        <div className="text-sm text-purple-600 font-medium">
+                        <div className="text-sm text-purple-400 font-medium">
                           {result.outputType}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-400">
                           {result.uploadedAt.toLocaleDateString()}
                         </div>
                       </button>
@@ -256,9 +329,7 @@ function App() {
             {currentAnalysis ? (
               <DocumentAnalysis 
                 result={currentAnalysis}
-                onQuestionSubmit={(question) => {
-                  console.log('Follow-up question:', question);
-                }}
+                onQuestionSubmit={(question) => handleFollowUpQuestion(currentAnalysis.id, question)}
               />
             ) : currentDocument ? (
               <AnalysisOptions

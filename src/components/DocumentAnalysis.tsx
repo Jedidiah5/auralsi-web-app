@@ -14,12 +14,20 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentUtterance, setCurrentUtterance] = useState<SpeechSynthesisUtterance | null>(null);
+  const [isProcessingQuestion, setIsProcessingQuestion] = useState(false);
 
-  const handleQuestionSubmit = (e: React.FormEvent) => {
+  const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (followUpQuestion.trim()) {
-      onQuestionSubmit(followUpQuestion);
-      setFollowUpQuestion('');
+    if (followUpQuestion.trim() && !isProcessingQuestion) {
+      setIsProcessingQuestion(true);
+      try {
+        await onQuestionSubmit(followUpQuestion);
+        setFollowUpQuestion('');
+      } catch (error) {
+        console.error('Error processing question:', error);
+      } finally {
+        setIsProcessingQuestion(false);
+      }
     }
   };
 
@@ -153,16 +161,16 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
   return (
     <div className="space-y-6">
       {/* Document Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
-            <div className={`p-3 bg-${colorClass}-50 rounded-lg`}>
-              <OutputIcon className={`w-6 h-6 text-${colorClass}-600`} />
+            <div className={`p-3 bg-${colorClass}-900/50 rounded-lg`}>
+              <OutputIcon className={`w-6 h-6 text-${colorClass}-400`} />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">{result.fileName}</h2>
-              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                <span className={`px-2 py-1 bg-${colorClass}-100 text-${colorClass}-700 rounded-full font-medium`}>
+              <h2 className="text-xl font-semibold text-white">{result.fileName}</h2>
+              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-400">
+                <span className={`px-2 py-1 bg-${colorClass}-900/50 text-${colorClass}-300 rounded-full font-medium`}>
                   {result.outputType}
                 </span>
                 <div className="flex items-center space-x-1">
@@ -174,7 +182,7 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
           </div>
           <button 
             onClick={downloadContent}
-            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
           >
             <Download className="w-4 h-4" />
             <span>Export</span>
@@ -183,13 +191,13 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
       </div>
 
       {/* Analysis Content */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <div className={`p-2 bg-${colorClass}-50 rounded-lg`}>
-              <OutputIcon className={`w-5 h-5 text-${colorClass}-600`} />
+            <div className={`p-2 bg-${colorClass}-900/50 rounded-lg`}>
+              <OutputIcon className={`w-5 h-5 text-${colorClass}-400`} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">{result.outputType}</h3>
+            <h3 className="text-lg font-semibold text-white">{result.outputType}</h3>
           </div>
           
           <button
@@ -202,23 +210,23 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
           </button>
         </div>
         
-        <div className="prose prose-gray max-w-none">
-          <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">{result.content}</div>
+        <div className="prose prose-invert max-w-none">
+          <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">{result.content}</div>
         </div>
       </div>
 
       {/* Audio Section */}
       {audioText && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
           <div className="flex items-center space-x-2 mb-4">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <Volume2 className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-purple-900/50 rounded-lg">
+              <Volume2 className="w-5 h-5 text-purple-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Audio-Optimized Text</h3>
+            <h3 className="text-lg font-semibold text-white">Audio-Optimized Text</h3>
           </div>
           
-          <div className="bg-purple-50 rounded-lg p-4 mb-4">
-            <p className="text-sm text-gray-700 leading-relaxed">{audioText}</p>
+          <div className="bg-purple-900/30 rounded-lg p-4 mb-4">
+            <p className="text-sm text-gray-300 leading-relaxed">{audioText}</p>
           </div>
           
           <div className="flex items-center space-x-3">
@@ -252,15 +260,15 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
               }}
-              className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               <Download className="w-4 h-4" />
               <span>Download Script</span>
             </button>
           </div>
           
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
+          <div className="mt-4 p-3 bg-blue-900/30 rounded-lg">
+            <p className="text-sm text-blue-300">
               <strong>Audio Features:</strong> The text has been optimized for clear speech with shorter sentences, 
               conversational tone, and natural pauses. You can play it directly or download the script for external TTS systems.
             </p>
@@ -270,22 +278,22 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
 
       {/* FAQ Section */}
       {result.faqExamples.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
           <div className="flex items-center space-x-2 mb-4">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <MessageSquare className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-purple-900/50 rounded-lg">
+              <MessageSquare className="w-5 h-5 text-purple-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Related Questions</h3>
+            <h3 className="text-lg font-semibold text-white">Related Questions</h3>
           </div>
           <div className="space-y-3">
             {result.faqExamples.map((faq, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg">
+              <div key={index} className="border border-gray-600 rounded-lg">
                 <button
                   onClick={() => handleFAQClick(index)}
-                  className="w-full text-left p-4 hover:bg-gray-50 transition-colors"
+                  className="w-full text-left p-4 hover:bg-gray-700 transition-colors"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900">{faq.question}</span>
+                    <span className="font-medium text-white">{faq.question}</span>
                     <div className={`w-5 h-5 transition-transform ${expandedFAQ === index ? 'rotate-180' : ''}`}>
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -294,7 +302,7 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
                   </div>
                 </button>
                 {expandedFAQ === index && (
-                  <div className="px-4 pb-4 text-gray-700 border-t border-gray-100 pt-4">
+                  <div className="px-4 pb-4 text-gray-300 border-t border-gray-600 pt-4">
                     {faq.answer}
                   </div>
                 )}
@@ -304,27 +312,115 @@ export const DocumentAnalysis: React.FC<DocumentAnalysisProps> = ({ result, onQu
         </div>
       )}
 
+      {/* Conversation History */}
+      {result.conversation && result.conversation.length > 0 && (
+        <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="p-2 bg-green-900/50 rounded-lg">
+              <MessageSquare className="w-5 h-5 text-green-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Previous Questions</h3>
+          </div>
+          <div className="space-y-4">
+            {result.conversation.map((entry) => (
+              <div key={entry.id} className="space-y-3">
+                {/* Question */}
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-900/50 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-blue-400">Q</span>
+                  </div>
+                  <div className="flex-1 bg-blue-900/30 rounded-lg p-3">
+                    <p className="text-white font-medium">{entry.question}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {entry.timestamp.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Answer */}
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-900/50 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-green-400">A</span>
+                  </div>
+                  <div className="flex-1 bg-green-900/30 rounded-lg p-3">
+                    <p className="text-gray-300">{entry.answer}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {entry.timestamp.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Follow-up Question */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Ask a Follow-up Question</h3>
+      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Ask a Follow-up Question</h3>
+        
+        {!result.conversation || result.conversation.length === 0 ? (
+          <div className="mb-4 p-4 bg-blue-900/30 rounded-lg">
+            <p className="text-sm text-blue-300">
+              <strong>💡 Tip:</strong> Ask follow-up questions to dive deeper into specific aspects of this document. 
+              You can ask about challenges, benefits, timelines, costs, or any other details that interest you.
+            </p>
+          </div>
+        ) : null}
+        
         <form onSubmit={handleQuestionSubmit} className="space-y-4">
           <div className="relative">
             <textarea
               value={followUpQuestion}
               onChange={(e) => setFollowUpQuestion(e.target.value)}
               placeholder="Ask anything about this document or analysis..."
-              className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full p-4 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:opacity-50 disabled:cursor-not-allowed bg-gray-700 text-white placeholder-gray-400"
               rows={3}
+              disabled={isProcessingQuestion}
             />
           </div>
+          
+          {/* Question Suggestions */}
+          <div className="space-y-2">
+            <p className="text-sm text-gray-400">Try asking about:</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "What are the main challenges?",
+                "What are the key benefits?",
+                "What's the timeline for implementation?",
+                "How much investment is required?",
+                "What are the main points covered?"
+              ].map((suggestion, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setFollowUpQuestion(suggestion)}
+                  disabled={isProcessingQuestion}
+                  className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+          
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={!followUpQuestion.trim()}
+              disabled={!followUpQuestion.trim() || isProcessingQuestion}
               className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
-              <Send className="w-4 h-4" />
-              <span>Ask Question</span>
+              {isProcessingQuestion ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  <span>Ask Question</span>
+                </>
+              )}
             </button>
           </div>
         </form>
