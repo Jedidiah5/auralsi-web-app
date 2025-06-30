@@ -47,8 +47,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, isAnalyzin
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      alert('File size must be less than 10MB.');
+    if (file.size > 50 * 1024 * 1024) { // 50MB limit
+      alert('File size must be less than 50MB.');
       return;
     }
 
